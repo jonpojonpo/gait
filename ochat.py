@@ -95,7 +95,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
                 progress_task = progress.add_task(description=f"[35mWorking some magic with {tool_call.function.name}...[0m", total=None)
                 result = await task
                 progress.remove_task(progress_task)
-            self.console.print(f"[1m[33mExecuted {tool_call.function.name}:[0m[33m {tool_call.function.arguments}[0m")
+            self.console.print(f"[1m[33mExecuted {tool_call.function.name}:[0m [33m{tool_call.function.arguments}[0m")
             self.console.print(f"[1m[32mResult (ta-da!):[0m\n{result}")
             results.append({
                 "tool_call_id": tool_call.id,
@@ -169,8 +169,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
                 break
 
         end_time = time.time()
-        self.console.print(f"[1m[34mTotal execution time: {end_time - start_time:.2f} seconds[0m (That's {(end_time - start_time) * 1000:.0f} milliseconds for the speed demons out there!)")
-
+        self.display_response(f"[1m[34mTotal execution time: {end_time - start_time:.2f} seconds[0m (That's {(end_time - start_time) * 1000:.0f} milliseconds for the speed demons out there!)")
         self.save_conversation()
 
     def send_message(self, content: str):
@@ -224,7 +223,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
         current_index = self.models.index(self.current_model)
         next_index = (current_index + 1) % len(self.models)
         self.current_model = self.models[next_index]
-        self.console.print(f"[1m[32mSwitched to model:[0m {self.current_model}")
+        self.display_response(f"[1m[32mSwitched to model:[0m {self.current_model}")
 
     def print_help(self):
         help_text = """
@@ -233,7 +232,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
         - [bold]/help[/bold]: Show this help message (you're looking at it!)
         - [bold]/model[/bold]: Change the current model (it's like changing hats, but for AIs)
         - [bold]/edit[/bold]: Open text editor for long messages (for when you're feeling extra verbose)
-        - [bold]/clear[/bold]: Clear the current conversation (amnesia on demand)
+        - [bold}/clear[/bold]: Clear the current conversation (amnesia on demand)
         - [bold}/save[/bold]: Save the current conversation (for posterity)
         - [bold}/load[/bold]: Load a previous conversation (time travel, anyone?)
         - [bold}/list[/bold]: List saved conversations (your chat history book)
@@ -245,35 +244,36 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
         - You can use ANSI color codes for colored text (paint with words)
         - For ASCII art, start each line with at least two spaces (create masterpieces)
         """
-        self.console.print(Panel(Markdown(help_text), title="Help & Shenanigans", border_style="bold", expand=False))
+        self.display_response(f"[1m[35m Help & Shenanigans [0m")
+        self.console.print(Panel(Markdown(help_text), border_style="bold", expand=False))
 
     def clear_conversation(self):
         self.messages = []
-        self.console.print("[1m[32mConversation cleared.[0m It's like we never met!")
+        self.display_response("[1m[32mConversation cleared.[0m It's like we never met!")
 
     def save_conversation(self):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"fun_conversation_{timestamp}.json"
         with open(filename, "w") as f:
             json.dump(self.messages, f)
-        self.console.print(f"[1m[32mConversation saved as[0m {filename} (It's immortal now!)")
+        self.display_response(f"[1m[32mConversation saved as[0m {filename} (It's immortal now!)")
 
     def load_conversation(self, filename):
         try:
             with open(filename, "r") as f:
                 self.messages = json.load(f)
-            self.console.print(f"[1m[32mLoaded conversation from[0m {filename} (Welcome back to the future!)")
+            self.display_response(f"[1m[32mLoaded conversation from[0m {filename} (Welcome back to the future!)")
         except FileNotFoundError:
-            self.console.print(f"[1m[31mFile {filename} not found.[0m (It's playing hide and seek, and winning!)")
+            self.display_response(f"[1m[31mFile {filename} not found.[0m (It's playing hide and seek, and winning!)")
 
     def list_conversations(self):
         conversations = [f for f in os.listdir() if f.startswith("fun_conversation_") and f.endswith(".json")]
         if conversations:
-            self.console.print("[1m[36mSaved conversations:[0m")
+            self.display_response("[1m[36mSaved conversations:[0m")
             for conv in conversations:
                 self.console.print(f"- {conv}")
         else:
-            self.console.print("[1m[33mNo saved conversations found.[0m (It's lonely in here!)")
+            self.display_response("[1m[33mNo saved conversations found.[0m (It's lonely in here!)")
 
     def load_conversation_history(self):
         history_file = "fun_conversation_history.json"
@@ -288,7 +288,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
 
     def run(self):
         signal.signal(signal.SIGWINCH, self.update_dimensions)
-        self.console.print("[1m[35m Welcome to the Fun OpenAI Chat! Where AI meets witty banter! [0m")
+        self.display_response("[1m[35m Welcome to the Fun OpenAI Chat! Where AI meets witty banter! [0m")
         self.print_separator()
         
         while True:
@@ -312,17 +312,17 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
             elif user_input.lower() == '/edit':
                 user_input = self.get_input_from_editor()
                 if user_input:
-                    self.console.print(f"[bold cyan]You:[/bold cyan] {user_input}")
+                    self.display_response(f"[bold cyan]You:[/bold cyan] {user_input}")
                     self.print_separator()
                     self.send_message(user_input)
                     self.print_separator()
             elif user_input:
-                self.console.print(f"[bold cyan]You:[/bold cyan] {user_input}")
+                self.display_response(f"[bold cyan]You:[/bold cyan] {user_input}")
                 self.print_separator()
                 self.send_message(user_input)
                 self.print_separator()
 
-        self.console.print("[1m[35mThanks for chatting! May your code be bug-free and your puns be groan-worthy![0m")
+        self.display_response("[1m[35mThanks for chatting! May your code be bug-free and your puns be groan-worthy![0m")
         self.save_conversation_history()
 
     def get_input_from_editor(self):
@@ -342,6 +342,6 @@ if __name__ == '__main__':
     try:
         chat.run()
     except KeyboardInterrupt:
-        chat.console.print("\n[1m[35mInterrupted! Exiting the Fun OpenAI Chat. See you next time! [0m")
+        chat.display_response("\n[1m[35mInterrupted! Exiting the Fun OpenAI Chat. See you next time! [0m")
         chat.save_conversation_history()
         sys.exit(0)
