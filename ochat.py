@@ -133,7 +133,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
 
         try:
             response = await asyncio.to_thread(
-                openai.ChatCompletion.create,
+                self.client.chat.completion.create,
                 model=self.current_model,
                 messages=[{"role": "system", "content": self.system_prompt}] + self.messages,
                 functions=tools,
@@ -155,7 +155,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
                     self.messages.append(message)  # Ensure proper message appending
                     tool_call_count += 1
                     response = await asyncio.to_thread(
-                        openai.ChatCompletion.create,
+                        self.client.chat.completion.create,
                         model=self.current_model,
                         messages=[{"role": "system", "content": self.system_prompt}] + self.messages,
                         functions=tools,
