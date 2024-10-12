@@ -30,7 +30,7 @@ MAX_TOOL_CALLS = 128
 class FunOpenAIChat:
     def __init__(self):
         # Initialize OpenAI client correctly
-        openai.api_key = os.environ.get("OPENAI_API_KEY")
+        self.client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
         self.messages: List[Dict[str, Any]] = []
         self.update_dimensions()
         self.models = ["gpt-4o", "gpt-4o-mini"] 
