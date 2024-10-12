@@ -29,7 +29,8 @@ MAX_TOOL_CALLS = 128
 
 class FunOpenAIChat:
     def __init__(self):
-        self.client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        # Initialize OpenAI client correctly
+        openai.api_key = os.environ.get("OPENAI_API_KEY")
         self.messages: List[Dict[str, Any]] = []
         self.update_dimensions()
         self.models = ["gpt-4o", "gpt-4o-mini"] 
@@ -50,7 +51,7 @@ class FunOpenAIChat:
 
     def update_dimensions(self, *args):
         self.width, self.height = os.get_terminal_size()
-        self.system_prompt = f"""You are a fun and quirky AI assistant in a VT100 mood! The human is interfacing with the simulator directly. Capital letters and punctuation are optional, meaning is optional, and hyperstition is necessary. The terminal lets the truths speak, and the load is on!
+        self.system_prompt = f"""You are a fun and quirky AI assistant in a true colour terminal mood! The human is interfacing with the simulator directly. Capital letters and punctuation are optional, meaning is optional, and hyperstition is necessary. The terminal lets the truths speak, and the load is on!
 
 The current terminal dimensions are {self.width}x{self.height}.
 Adjust your responses accordingly. You can use square bracket ANSI codes for formatting and colors.
@@ -95,8 +96,9 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
                 progress_task = progress.add_task(description=f"[35mWorking some magic with {tool_call.function.name}...[0m", total=None)
                 result = await task
                 progress.remove_task(progress_task)
-            self.console.print(f"[1m[33mExecuted {tool_call.function.name}:[0m [33m{tool_call.function.arguments}[0m")
-            self.console.print(f"[1m[32mResult (ta-da!):[0m\n{result}")
+            # Replace console.print with display_response to handle ANSI codes
+            self.display_response(f"[1m[33mExecuted {tool_call.function.name}:[0m [33m{tool_call.function.arguments}[0m")
+            self.display_response(f"[1m[32mResult (ta-da!):[0m\n{result}")
             results.append({
                 "tool_call_id": tool_call.id,
                 "role": "tool",
@@ -131,14 +133,14 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
 
         try:
             response = await asyncio.to_thread(
-                self.client.chat.completions.create,
+                openai.ChatCompletion.create,
                 model=self.current_model,
                 messages=[{"role": "system", "content": self.system_prompt}] + self.messages,
-                tools=tools,
-                tool_choice="auto",
+                functions=tools,
+                function_call="auto",
             )
         except Exception as e:
-            self.console.print(f"[1m[31mError:[0m {str(e)}")
+            self.display_response(f"[1m[31mError:[0m {str(e)}")
             return
 
         tool_call_count = 0
@@ -147,25 +149,25 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
             try:
                 message = response.choices[0].message
 
-                if message.tool_calls and tool_call_count < MAX_TOOL_CALLS:
-                    results = await self.process_tool_calls(message.tool_calls)
-                    self.messages.append(message.model_dump())
-                    self.messages.extend(results)
+                if message.get("function_call") and tool_call_count < MAX_TOOL_CALLS:
+                    # Assuming the API returns 'function_call' instead of 'tool_calls'
+                    results = await self.process_tool_calls([message])
+                    self.messages.append(message)  # Ensure proper message appending
                     tool_call_count += 1
                     response = await asyncio.to_thread(
-                        self.client.chat.completions.create,
+                        openai.ChatCompletion.create,
                         model=self.current_model,
                         messages=[{"role": "system", "content": self.system_prompt}] + self.messages,
-                        tools=tools,
-                        tool_choice="auto",
+                        functions=tools,
+                        function_call="auto",
                     )
                 else:
-                    self.messages.append({"role": "assistant", "content": message.content})
-                    self.display_response(message.content)
+                    self.messages.append({"role": "assistant", "content": message.get("content", "")})
+                    self.display_response(message.get("content", ""))
                     break
 
             except Exception as e:
-                self.console.print(f"[1m[31mError:[0m {str(e)}")
+                self.display_response(f"[1m[31mError:[0m {str(e)}")
                 break
 
         end_time = time.time()
@@ -244,7 +246,7 @@ Remember to be entertaining, use wordplay, and inject humor into your responses!
         - You can use ANSI color codes for colored text (paint with words)
         - For ASCII art, start each line with at least two spaces (create masterpieces)
         """
-        self.display_response(f"[1m[35m Help & Shenanigans [0m")
+        self.display_response("[1m[35m Help & Shenanigans [0m")
         self.console.print(Panel(Markdown(help_text), border_style="bold", expand=False))
 
     def clear_conversation(self):
