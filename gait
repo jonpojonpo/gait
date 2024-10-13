@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+
+import sys
+import os
+import subprocess
+
+TOOL_MAPPING = {
+    'agt': ('agt.py', 'Sentiment Analysis Tool'),
+    'cchat': ('cchat.py', 'Claude Chat Interface'),
+    'cct': ('cct.py', 'Code Completion Tool'),
+    'cgen': ('cgen.py', 'Code Generation Tool'),
+    'cgt': ('cgt.py', 'Claude Generate Tokens'),
+    'cia': ('cia.py', 'Claude Interactive Agent'),
+    'ochat': ('ochat.py', 'OpenAI Chat Interface'),
+    'oge': ('oge.py', 'OpenAI Generate Embeddings'),
+    'ogt': ('ogt.py', 'OpenAI Generate Tokens'),
+    'oia': ('oia.py', 'OpenAI Interactive Agent'),
+    'osum': ('osum.py', 'OpenAI Summarization'),
+    'tc': ('tc.py', 'Token Count'),
+    'tlt': ('tlt.py', 'Translate Language Tokens')
+}
+
+def print_help():
+    print("Usage: gait <tool_name> [arguments]")
+    print("\nAvailable tools:")
+    max_name_length = max(len(name) for name in TOOL_MAPPING)
+    for name, (_, description) in TOOL_MAPPING.items():
+        print(f"  {name:<{max_name_length}} - {description}")
+    print("\nFor tool-specific help, use: gait <tool_name> --help")
+    print("\nAdditional commands:")
+    print("  help    - Show this help message")
+
+def main():
+    if len(sys.argv) < 2 or sys.argv[1] == 'help':
+        print_help()
+        sys.exit(0)
+
+    tool_name = sys.argv[1]
+    if tool_name not in TOOL_MAPPING:
+        print(f"Error: Unknown tool '{tool_name}'")
+        print("Use 'gait help' to see a list of available tools.")
+        sys.exit(1)
+
+    script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), TOOL_MAPPING[tool_name][0])
+    
+    if not os.path.exists(script_path):
+        print(f"Error: Tool script not found at {script_path}")
+        sys.exit(1)
+
+    try:
+        subprocess.run([sys.executable, script_path] + sys.argv[2:], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error: Tool execution failed with exit code {e.returncode}")
+        sys.exit(e.returncode)
+
+if __name__ == "__main__":
+    main()

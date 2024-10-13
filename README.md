@@ -32,56 +32,76 @@ For tools that use Claude, set up your Anthropic API key:
 export ANTHROPIC_API_KEY='your-anthropic-api-key-here'
 ```
 
+After installation, make the wrapper script executable:
+
+```bash
+chmod +x gait
+```
+
+Then, add the GAIT directory to your PATH or create a symlink to the `gait` script in a directory that's already in your PATH.
+
 ## Tools
 
 GAIT includes the following tools:
 
-1. `agt.py`: Sentiment Analysis Tool
-2. `cchat.py`: Claude Chat Interface
-3. `cct.py`: Code Completion Tool
-4. `cgen.py`: Code Generation Tool
-5. `cgt.py`: Claude Generate Tokens
-6. `cia.py`: Claude Interactive Agent
-7. `ochat.py`: OpenAI Chat Interface
-8. `oge.py`: OpenAI Generate Embeddings
-9. `ogt.py`: OpenAI Generate Tokens
-10. `oia.py`: OpenAI Interactive Agent
-11. `osum.py`: OpenAI Summarization
-12. `tc.py`: Token Count
-13. `tlt.py`: Translate Language Tokens
+1. `agt`: Sentiment Analysis Tool
+2. `cchat`: Claude Chat Interface
+3. `cct`: Code Completion Tool
+4. `cgen`: Code Generation Tool
+5. `cgt`: Claude Generate Tokens
+6. `cia`: Claude Interactive Agent
+7. `ochat`: OpenAI Chat Interface
+8. `oge`: OpenAI Generate Embeddings
+9. `ogt`: OpenAI Generate Tokens
+10. `oia`: OpenAI Interactive Agent
+11. `osum`: OpenAI Summarization
+12. `tc`: Token Count
+13. `tlt`: Translate Language Tokens
+
+To see a list of all available tools with their descriptions, use the help command:
+
+```bash
+gait help
+```
 
 ## Usage
 
-Each tool in the GAIT collection can be run from the command line. Here are some examples:
+GAIT comes with a convenient wrapper script that allows you to run any tool directly. Instead of typing `python tool_name.py`, you can now use:
+
+```bash
+gait <tool_name> [arguments]
+```
+
+For example:
 
 ### Sentiment Analysis
 
 ```bash
-python agt.py --sentiment "I love using this AI toolbox!"
+gait agt --sentiment "I love using this AI toolbox!"
 ```
 
 ### Generate Code
 
 ```bash
-python cgen.py --python "Write a function to calculate the Fibonacci sequence"
+gait cgen --python "Write a function to calculate the Fibonacci sequence"
 ```
 
 ### Interactive Chat
 
 ```bash
-python ochat.py
+gait ochat
 ```
 
 ### Token Counting
 
 ```bash
-python tc.py "Count the tokens in this sentence"
+gait tc "Count the tokens in this sentence"
 ```
 
 For detailed usage instructions for each tool, use the `-h` or `--help` flag:
 
 ```bash
-python <tool_name>.py --help
+gait <tool_name> --help
 ```
 
 ## Contributing
