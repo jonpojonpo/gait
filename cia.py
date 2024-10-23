@@ -35,19 +35,19 @@ class AdvancedClaudeChat:
         self.client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
         self.messages: List[Dict[str, Any]] = []
         self.models = [
-            "claude-3-5-sonnet-20240620",
+            "claude-3-5-sonnet-20241022",
             "claude-3-opus-20240229",
             "claude-3-sonnet-20240229",
             "claude-3-haiku-20240307"
         ]
-        self.current_model = "claude-3-5-sonnet-20240620"
+        self.current_model = "claude-3-5-sonnet-20241022"
         self.editor = os.environ.get("EDITOR", "vim")
         self.conversation_history: List[Dict[str, Any]] = []
         self.load_conversation_history()
 
         self.tools = [{
-            "name": "execute_shell_command",
-            "description": "Execute a shell command on the local system",
+            "name": "bash",
+            "description": "bash_20241022",
             "input_schema": {
                 "type": "object",
                 "properties": {
@@ -87,7 +87,7 @@ Always provide the full command output to the user and explain its meaning.
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE
             )
-            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=60)
+            stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=120)
             if process.returncode != 0:
                 return f"Command exited with non-zero status. Stderr: {stderr.decode()}"
             return stdout.decode()
@@ -103,7 +103,7 @@ Always provide the full command output to the user and explain its meaning.
                 with self.console.status("[bold green]Claude is thinking...", spinner="dots"):
                     response = self.client.messages.create(
                         model=self.current_model,
-                        max_tokens=1024,
+                        max_tokens=2048,
                         system=self.system_prompt,
                         messages=self.messages,
                         tools=self.tools
