@@ -1,3 +1,4 @@
+LOGS_DIR = "logs/conversations"
 import os
 import signal
 import sys
@@ -236,7 +237,7 @@ Always provide the full command output to the user and explain its meaning.
 
     async def save_conversation(self):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"conversation_{timestamp}.json"
+        filename = os.path.join(LOGS_DIR, f"conversation_\1.json")
         with open(filename, "w") as f:
             json.dump(self.messages, f)
         self.console.print(f"[bold green]Conversation saved as[/bold green] {filename}")
