@@ -1,3 +1,7 @@
+# Define constants for file paths
+LOGS_DIR = "logs/conversations"
+
+
 #!/usr/bin/env python3
 """
 CIA (Claude Interactive Agent) - An interactive chat interface for Anthropic's Claude model.
