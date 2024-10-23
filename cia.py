@@ -125,7 +125,7 @@ Always provide the full command output to the user and explain its meaning.
                         })
 
                 if tool_use:
-                    if tool_use.name == 'execute_shell_command':
+                    if tool_use.name == 'bash':
                         command = tool_use.input['command']
                         result = await self.execute_shell_command_async(command)
                         self.console.print(f"[bold cyan]Executed command:[/bold cyan] {command}")
