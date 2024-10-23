@@ -236,7 +236,7 @@ Always provide the full command output to the user and explain its meaning.
 
     async def save_conversation(self):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"conversation_{timestamp}.json"
+        filename = f"logs/conversations/conversation_\1"
         with open(filename, "w") as f:
             json.dump(self.messages, f)
         self.console.print(f"[bold green]Conversation saved as[/bold green] {filename}")
